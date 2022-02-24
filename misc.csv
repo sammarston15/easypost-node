@@ -1,0 +1,4 @@
+dest_country,postcode_begin,postcode_end,zone
+GB,000,ZZZ,1
+GB,JE00000,JEZZZZZ,2
+GB,GY00000,GYZZZZZ,2
