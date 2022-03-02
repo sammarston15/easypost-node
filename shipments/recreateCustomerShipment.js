@@ -75,18 +75,17 @@ if (ship.options.bill_receiver_postal_code) {
 }
 
 
-// ship.options.label_format = "PDF"
-// ship.options.label_size = "8.5X11_BOTTOM_HALF_LABEL"
+ship.options.label_format = "PNG"
+ship.options.label_size = "4x6"
 // ship.to_address.state = null
-ship.options.commercial_invoice_letterhead = null
-ship.options.commercial_invoice_signature = null
+
 
 
 
 // SHIPMENT
 const shipment = new api.Shipment({
-    // to_address: ship.to_address,
-    to_address: 'adr_1563b2aebdd749ce9c3989ed5c54fccf',
+    to_address: ship.to_address,
+    // to_address: 'adr_1563b2aebdd749ce9c3989ed5c54fccf',
     from_address: ship.from_address,
     // from_address: process.env.adr_us_two,
     // return_address: process.env.adr_us_one,
@@ -94,7 +93,7 @@ const shipment = new api.Shipment({
     parcel: ship.parcel,
     customs_info: ship.customs_info,
     options: ship.options,
-    carrier_accounts: [`${process.env.dhlExpress}`],
+    carrier_accounts: [`${process.env.usps}`],
     // service: 'FirstClassPackageInternationalService',
     is_return: ship.is_return,
     reference: ship.reference
@@ -102,14 +101,14 @@ const shipment = new api.Shipment({
 
 
 // save shipment
-shipment.save().then(console.log).catch(error => console.log(error));
+// shipment.save().then(console.log).catch(error => console.log(error));
 
 
 //============buy shipment by lowest rate============
-// shipment.save().then(buyShipment => {
-//   shipment.buy(shipment.lowestRate())
-//     .then(console.log).catch(console.log);
-// }).catch(console.log);
+shipment.save().then(buyShipment => {
+  shipment.buy(shipment.lowestRate())
+    .then(console.log).catch(console.log);
+}).catch(console.log);
 
 //============buy shipment by carrier name/service type============
 // shipment.save().then(s =>
