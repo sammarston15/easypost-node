@@ -24,29 +24,44 @@ const spain2 = dad.random('EU_ES');
 // CREATE FROM ADDRESS
 const fromAddress = new api.Address({
   company: 'EasyPost',
-  street1: unitedstates1.street1,
-  street2: unitedstates1.street2,
-  city: unitedstates1.city,
-  state: unitedstates1.state,
-  zip: unitedstates1.zip,
-  country: unitedstates1.country,
+  street1: canada1.street1,
+  street2: canada1.street2,
+  city: canada1.city,
+  state: canada1.state,
+  zip: canada1.zip,
+  country: canada1.country,
   phone: '415-528-7555',
   email: 'example@email.com',
   // federal_tax_id: '12345'
 });
 fromAddress.save()
 
+// CREATE RETURN ADDRESS
+const returnAddress = new api.Address({
+  company: 'EasyPost',
+  street1: canada1.street1,
+  street2: canada1.street2,
+  city: canada1.city,
+  state: canada1.state,
+  zip: canada1.zip,
+  country: canada1.country,
+  phone: '415-528-7555',
+  email: 'example@email.com',
+  // federal_tax_id: '12345'
+});
+returnAddress.save()
+
 
 
 // CREATE TO ADDRESS
 const toAddress = new api.Address({
-  company: 'Project Destination',
-  street1: unitedstates2.street1,
-  street2: unitedstates2.street2,
-  city: unitedstates2.city,
-  state: unitedstates2.state,
-  zip: unitedstates2.zip,
-  country: unitedstates2.country,
+  company: 'Example Destination',
+  street1: canada2.street1,
+  street2: canada2.street2,
+  city: canada2.city,
+  state: canada2.state,
+  zip: canada2.zip,
+  country: canada2.country,
   phone: '415-528-7555', 
   email: 'example@email.com',
   // federal_tax_id: '12345',
@@ -105,9 +120,10 @@ customsInfo.save();
 
 // CREATE SHIPMENT
 const shipment = new api.Shipment({
-  is_return: true,
+  // is_return: true,
   to_address: toAddress,
   from_address: fromAddress,
+  return_address: returnAddress,
   parcel: parcel,
   customs_info: customsInfo,
   options: {
@@ -118,10 +134,10 @@ const shipment = new api.Shipment({
     // print_custom_3_code: "RMA",
     // print_custom_1_barcode: true,
     // print_custom_2_barcode: true,
-    // label_format: 'ZPL',
-    // label_size: "8.5X11_TOP_HALF_LABEL",
+    label_format: 'ZPL',
+    label_size: "4x6",
     // label_size: "4x6",
-    // incoterm: "DDU",
+    // incoterm: "DAP",
     // invoice_number: '123456789'
     // importer_address_id: 'adr_cac53236bc4e49edbc4e07146766998d',
     // payment: {
@@ -138,20 +154,27 @@ const shipment = new api.Shipment({
     // }
     // dropoff_max_datetime: '2021-05-20T15:00:00Z',
     // delivery_confirmation: "SIGNATURE",
+    // commercial_invoice_format: "PNG"
   },
-  carrier_accounts: [process.env.usps],
-  service: 'Priority',
-  reference: toAddress.company
+  carrier_accounts: [process.env.canadaPost],
+  // service: 'Priority',
+  reference: toAddress.street1
 
 });
 
-shipment.save().then(console.log).catch(error => console.log(error));
+// shipment.save().then(console.log).catch(error => console.log(error));
 
 //============buy shipment by lowest rate============
-// shipment.save().then(buyShipment => {
-//   shipment.buy(shipment.lowestRate())
-//     .then(console.log).catch(console.log);
-// }).catch(console.log);
+shipment.save().then(s => {
+  // log shipment create/rating call
+  console.log(s)
+  console.log("        ")
+  console.log("        ")
+  console.log("BUY CALL")
+  console.log("########")
+  // attempt to buy shipment's lowest rate and log the results
+  s.buy(s.lowestRate()).then(console.log).catch(console.log);
+}).catch(console.log);
 
 //============buy shipment by carrier name/service type============
 // shipment.save().then(s =>
