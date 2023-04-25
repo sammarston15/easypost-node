@@ -1,21 +1,21 @@
-const Easypost = require('@easypost/api');
-require('dotenv').config();
-// const api = new Easypost(process.env.prodKey);  // prodKey
-const api = new Easypost(process.env.testKey);     // testKey
+/* IMPORT EASYPOST AND .ENV INFO */
+import EasyPostClient from "@easypost/api"
+import * as dotenv from "dotenv" // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+dotenv.config()
+import crypto from "crypto"
+import fs from "fs"
 
+// const client = new EasyPostClient(process.env.PROD_KEY);  // prodKey
+const client = new EasyPostClient(process.env.TEST_KEY) // testKey
 
-// ==========retrieve shipment==========
-//  const shipment = api.Shipment.retrieve('shp_62485ba1bd4745cc943a0a28bb86283a').then(console.log).catch(console.log);
+//============retrieve shipment============
+try {
+  const shipment = await client.Shipment.retrieve('shp_...')
+  
+  console.log(shipment)
 
-
- // ==========retrieve and buy shipment==========
-//  const shipment = api.Shipment.retrieve('shp_62485ba1bd4745cc943a0a28bb86283a').then(s => {
-//   s.buy(s.lowestRate(['UPS'], ['UPSStandard'])).then(console.log).catch(console.log);
-// });
-
-
-// ========== retrieve a list of shipments ==========
-api.Shipment.all({
-  page_size: 2,
-  start_datetime: '2021-01-02T08:50:00Z'
-}).then(console.log);
+} catch (error) {
+  console.log("   ")
+  console.log("SHIPMENT RETRIEVE ERROR:")
+  console.log(error)
+}

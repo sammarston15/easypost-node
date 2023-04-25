@@ -1,7 +1,10 @@
-
-441101645721867105,
-404271645725726330,
-423751645725775247,
-939041645725827093,
-441101645805174142,
-441101645805460991
+curl -X POST https://api.easypost.com/v2/batches/batch_.../remove_shipments ^
+  -u "$EASYPOST_API_KEY": ^
+  -H "Content-Type: application/json" ^
+  -d "{
+    "shipments": [
+      {
+        "id": "shp_..."
+      }
+    ]
+  }"

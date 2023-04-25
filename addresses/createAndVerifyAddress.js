@@ -1,3 +1,4 @@
+
 /* IMPORT EASYPOST AND .ENV INFO */
 import EasyPostClient from "@easypost/api"
 import * as dotenv from "dotenv" // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
@@ -8,15 +9,22 @@ import fs from "fs"
 // const client = new EasyPostClient(process.env.PROD_KEY);  // prodKey
 const client = new EasyPostClient(process.env.TEST_KEY) // testKey
 
-//============consolidate all shipment labels to one label file============
+//============create address with verification============
 try {
-  const batch = await client.Batch.retrieve('batch_...');
+  const address = await client.Address.createAndVerify({
+    street1: '417 MONTGOMERY ST',
+    street2: 'FLOOR 5',
+    city: 'SAN FRANCISCO',
+    state: 'CA',
+    zip: '94104',
+    country: 'US',
+    company: 'EasyPost',
+    phone: '415-123-4567',
+  });
 
-  const batchWithLabel = await client.Batch.generateLabel(batch.id, 'PDF');
-
-  console.log(batchWithLabel);
+  console.log(address);
 } catch (error) {
   console.log("   ")
-  console.log("BATCH LABEL ERROR:")
+  console.log("CREATE AND VERIFY ADDRESS ERROR:")
   console.log(error)
 }

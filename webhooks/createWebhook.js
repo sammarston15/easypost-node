@@ -8,15 +8,13 @@ import fs from "fs"
 // const client = new EasyPostClient(process.env.PROD_KEY);  // prodKey
 const client = new EasyPostClient(process.env.TEST_KEY) // testKey
 
-//============consolidate all shipment labels to one label file============
+//============CREATE A WEBHOOK============
 try {
-  const batch = await client.Batch.retrieve('batch_...');
+    const webhook = await client.Webhook.create({ url: 'example.com' });
 
-  const batchWithLabel = await client.Batch.generateLabel(batch.id, 'PDF');
-
-  console.log(batchWithLabel);
+    console.log(webhook);
 } catch (error) {
   console.log("   ")
-  console.log("BATCH LABEL ERROR:")
+  console.log("WEBHOOK CREATE ERROR:")
   console.log(error)
 }

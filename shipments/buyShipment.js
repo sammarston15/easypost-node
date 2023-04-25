@@ -1,14 +1,26 @@
-const Easypost = require('@easypost/api');
-require('dotenv').config();
-// const api = new Easypost(process.env.prodKey);  // prodKey
-const api = new Easypost(process.env.testKey);     // testKey
+/* IMPORT EASYPOST AND .ENV INFO */
+import EasyPostClient from "@easypost/api"
+import * as dotenv from "dotenv" // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+dotenv.config()
+import crypto from "crypto"
+import fs from "fs"
 
-/* retrieve shipment via shipment id */
-api.Shipment.retrieve('test1').then(s => {
-  console.log(s)
-  // s.buy('rate_062d2696973c437fa946a1b7ca92a027').then(console.log).catch((error) => {
-  //   console.log('buy rate catch: ', error)
-  // });
-}).catch((error) => {
-  console.log('retrieve shipment catch: ', error)
-});
+// const client = new EasyPostClient(process.env.PROD_KEY);  // prodKey
+const client = new EasyPostClient(process.env.TEST_KEY) // testKey
+
+//============buy shipment by lowest rate============
+try {
+  const shipment = await client.Shipment.retrieve('shp_...')
+  console.log("   ")
+  console.log("   ")
+  console.log(`attempting to purchase ${shipment.id}...`)
+  const boughtShipment = await client.Shipment.buy(
+      shipment.id,
+      shipment.lowestRate()
+  )
+  console.log(JSON.stringify(boughtShipment, null, 2))
+} catch (error) {
+  console.log("   ")
+  console.log("SHIPMENT BUY ERROR:")
+  console.log(error)
+}

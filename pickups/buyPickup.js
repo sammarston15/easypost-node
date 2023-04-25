@@ -1,18 +1,22 @@
+/* IMPORT EASYPOST AND .ENV INFO */
+import EasyPostClient from "@easypost/api"
+import * as dotenv from "dotenv" // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+dotenv.config()
+import crypto from "crypto"
+import fs from "fs"
 
-require('dotenv').config();
+// const client = new EasyPostClient(process.env.PROD_KEY);  // prodKey
+const client = new EasyPostClient(process.env.TEST_KEY) // testKey
 
+//============buy a pickup============
+try {
+  const pickup = await client.Pickup.retrieve('pickup_...');
 
-const Easypost = require('@easypost/api');
-const apiKey = process.env.testKey;
-// const apiKey = process.env.prodKey;
-const api = new Easypost(apiKey);
+  const boughtPickup = await client.Pickup.buy(pickup.id, 'UPS', 'Same-day Pickup');
 
-
-
-// retrieve pickup
-// api.Pickup.retrieve('pickup_7c5fbce9db9d42bfbd14cef95d8b583c').then(p => console.log(p.pickup_rates[0].service));
-
-// retrieve and buy pickup
-api.Pickup.retrieve('pickup_4a00ffa069d94e72a8b3d5bd45fcd9a1').then(p => {
-    p.buy('USPS', 'NextDay').then(console.log).catch(console.log);
-  }).catch(console.log);
+  console.log(boughtPickup);
+} catch (error) {
+  console.log("   ")
+  console.log("PICKUP BUY ERROR:")
+  console.log(error)
+}

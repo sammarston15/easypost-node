@@ -1,17 +1,22 @@
-require('dotenv').config();
+/* IMPORT EASYPOST AND .ENV INFO */
+import EasyPostClient from "@easypost/api"
+import * as dotenv from "dotenv" // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+dotenv.config()
+import crypto from "crypto"
+import fs from "fs"
 
+// const client = new EasyPostClient(process.env.PROD_KEY);  // prodKey
+const client = new EasyPostClient(process.env.TEST_KEY) // testKey
 
-const Easypost = require('@easypost/api');
-const apiKey = process.env.testKey;
-// const apiKey = process.env.prodKey;
-const api = new Easypost(apiKey);
+//============buy shipment by lowest rate============
+try {
+    const order = await client.Order.retrieve('order_...');
 
-
-
-
-api.Order.retrieve('order_af09f06c74a74c1c900c22aeb376eb20').then(order => {
-    order.buy('FedEx', 'INTERNATIONAL_ECONOMY').then(console.log).catch(console.log)
-}).catch(console.log);
-
-
-// api.Order.retrieve('order_0e0fded9ef7d42cfb101c12076f769f7').then(console.log).catch(o => console.log(JSON.stringify(o)));
+    const boughtOrder = await client.Order.buy(order.id, 'FedEx', 'FEDEX_GROUND');
+  
+    console.log(boughtOrder);
+} catch (error) {
+  console.log("   ")
+  console.log("ORDER BUY ERROR:")
+  console.log(error)
+}

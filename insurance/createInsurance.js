@@ -8,15 +8,20 @@ import fs from "fs"
 // const client = new EasyPostClient(process.env.PROD_KEY);  // prodKey
 const client = new EasyPostClient(process.env.TEST_KEY) // testKey
 
-//============consolidate all shipment labels to one label file============
+//============buy shipment by lowest rate============
 try {
-  const batch = await client.Batch.retrieve('batch_...');
+  const insurance = await client.Insurance.create({
+    to_address: { id: 'adr_...' },
+    from_address: { id: 'adr_...' },
+    tracking_code: '9400110898825022579493',
+    carrier: 'USPS',
+    amount: '100.00',
+    reference: 'insuranceRef1',
+  });
 
-  const batchWithLabel = await client.Batch.generateLabel(batch.id, 'PDF');
-
-  console.log(batchWithLabel);
+  console.log(insurance);
 } catch (error) {
   console.log("   ")
-  console.log("BATCH LABEL ERROR:")
+  console.log("ERROR CREATING INSURANCE:")
   console.log(error)
 }

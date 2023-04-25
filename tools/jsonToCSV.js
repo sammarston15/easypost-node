@@ -2,7 +2,7 @@ const converter = require('json-2-csv');
 const fs = require('fs');
 
 // add JSON from admin here
-const myJson = require('./misc.json');
+const myJson = require('../misc.json');
 const batchShipments = myJson;
 
 // convert JSON array to CSV string

@@ -8,15 +8,13 @@ import fs from "fs"
 // const client = new EasyPostClient(process.env.PROD_KEY);  // prodKey
 const client = new EasyPostClient(process.env.TEST_KEY) // testKey
 
-//============consolidate all shipment labels to one label file============
+//============retrieve available carrier account types============
 try {
-  const batch = await client.Batch.retrieve('batch_...');
+    const carrierAccounts = await client.CarrierAccount.all();
 
-  const batchWithLabel = await client.Batch.generateLabel(batch.id, 'PDF');
-
-  console.log(batchWithLabel);
+  console.log(carrierAccounts);
 } catch (error) {
   console.log("   ")
-  console.log("BATCH LABEL ERROR:")
+  console.log("ERROR GETTING CARRIER ACCOUNT TYPES:")
   console.log(error)
 }
