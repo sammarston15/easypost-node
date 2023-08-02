@@ -11,9 +11,11 @@ const client = new EasyPostClient(process.env.TEST_KEY) // testKey
 //============create a report============
 try {
   const report = await client.Report.create({
-    type: 'payment_log',
-    start_date: '2022-10-01',
-    end_date: '2022-10-31',
+    type: 'shipment_invoice',
+    start_date: '2023-06-25',
+    end_date: '2023-07-25',
+    send_email: true,
+    include_children: false,
   });
 
   console.log(report);

@@ -8,7 +8,7 @@ import fs from "fs"
 // const client = new EasyPostClient(process.env.PROD_KEY);  // prodKey
 const client = new EasyPostClient(process.env.TEST_KEY) // testKey
 
-//============buy shipment by lowest rate============
+//============buy order============
 try {
     const order = await client.Order.retrieve('order_...');
 

@@ -20,6 +20,7 @@ try {
     country: 'US',
     company: 'EasyPost',
     phone: '415-123-4567',
+    residential: false
   });
 
   console.log(address);

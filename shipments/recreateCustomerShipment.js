@@ -14,7 +14,7 @@ const client = new EasyPostClient(process.env.TEST_KEY) // testKey
 import ship from '../misc.json' assert { type: 'json' }
 
 
-// DELETES ALL THE UNESSCESARY ATTRIBUTES
+// DELETES ALL THE NECESSARY ATTRIBUTES
 if (ship.to_address) {
     delete ship.to_address.id
     delete ship.to_address.mode
@@ -89,6 +89,7 @@ if (ship.options.bill_receiver_postal_code) {
     delete ship.options.bill_receiver_postal_code
 }
 
+
 // ADDITIONAL OPTIONS
 // ship.options.label_format = "PNG"
 // ship.options.cost_center = "easypost1"
@@ -97,6 +98,8 @@ if (ship.options.bill_receiver_postal_code) {
 // ship.customs_info.customs_items[0].description = "example description"
 // ship.customs_info.customs_items[1].description = "example description"
 // ship.customs_info.customs_items[2].description = "example description"
+// ship.options.importer_address_id = "adr_xxxxx"
+
 
 // CREATE SHIPMENT
 try {
@@ -112,8 +115,9 @@ try {
         // buyer_address: ship.buyer_address,
         parcel: ship.parcel,
         customs_info: ship.customs_info,
-        options: {
-            print_custom_1: "printCustom1",
+        options: ship.options,
+        // options: {
+            // print_custom_1: "printCustom1",
             // print_custom_2: "printCustom2",
             // print_custom_2_code: "PO",
             // print_custom_3: "printCustom3",
@@ -125,7 +129,7 @@ try {
             // label_date: "2022-06-25T15:00:00Z"
             // incoterm: "DAP",
             // invoice_number: '123456789'
-            // importer_address_id: 'adr_cac53236bc4e49edbc4e07146766998d',
+            // importer_address_id: 'adr_f82f2dee2b1a11ee98b4ac1f6bc539aa',
             // payment: {
             //   type: "THIRD_PARTY",
             //   account: "510087780",
@@ -146,22 +150,62 @@ try {
             //   pickup_min_datetime: '2022-05-10 10:30:00',
             //   pickup_max_datetime: '2022-05-10 10:30:00',
             // customs_broker_address_id: toAddress.id
-        },
-        carrier_accounts: [process.env.USPS],
+        // },
+        carrier_accounts: [process.env.SENDLE],
         // service: 'First',
         reference: crypto.randomUUID(),
     })
 
+    // log entire shipment object
     console.log(JSON.stringify(shipment, null, 2))
 
+    // log any rate errors
+    if (shipment.messages !== []) {
+        console.log("  ")
+        console.log('RATE ERRORS:')
+        console.log(JSON.stringify(shipment.messages, null, 2))
+    }
+
+    // log any rates
+    if (shipment.rates.length >= 1) {
+        console.log("   ")
+        console.log('RATES:')
+        for (const i in shipment.rates) {
+            console.log(`${shipment.rates[i].carrier} - ${shipment.rates[i].service} - ${shipment.rates[i].rate}`)
+        }
+        console.log("   ")
+    }
+
     //============buy shipment by lowest rate============
+    // try {
+    //     console.log("   ")
+    //     console.log("   ")
+    //     console.log(`attempting to purchase ${shipment.id}...`)
+    //     const boughtShipment = await client.Shipment.buy(
+    //         shipment.id, // shipment id
+    //         shipment.lowestRate(), // shipment rate
+    //         null, // insurance
+    //         null, // carbon offset
+    //         // process.env.TEST_ENDSHIPPER_ID_EXAMPLE // end shipper
+    //     )
+    //     console.log(JSON.stringify(boughtShipment, null, 2))
+    // } catch (error) {
+    //     console.log("   ")
+    //     console.log("SHIPMENT BUY ERROR:")
+    //     console.log(error)
+
+    //     // print full json
+    //     console.log(`\n\nSTRINGIFIED:\n${JSON.stringify(error, null, 2)}`)
+    // }
+
+    //============buy shipment by carrier name/service type============
     try {
         console.log("   ")
         console.log("   ")
         console.log(`attempting to purchase ${shipment.id}...`)
         const boughtShipment = await client.Shipment.buy(
             shipment.id,
-            shipment.lowestRate()
+            shipment.lowestRate(["Sendle"], ["SAVER-PICKUP"])
         )
         console.log(JSON.stringify(boughtShipment, null, 2))
     } catch (error) {
@@ -170,18 +214,6 @@ try {
         console.log(error)
     }
 
-    //============buy shipment by carrier name/service type============
-    // try {
-    //     const boughtShipment = await client.Shipment.buy(
-    //         shipment.id,
-    //         shipment.lowestRate(["USPS"], ["First"])
-    //     )
-    //     console.log(JSON.stringify(boughtShipment, null, 2))
-    // } catch (error) {
-    //     console.log("   ")
-    //     console.log("SHIPMENT BUY ERROR:")
-    //     console.log(error)
-    // }
 } catch (error) {
     console.log("   ")
     console.log("SHIPMENT CREATE ERROR:")

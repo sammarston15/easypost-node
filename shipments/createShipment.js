@@ -30,12 +30,12 @@ const spain2 = dad.random("EU_ES")
 const toAddress = await client.Address.create({
     name: "Example Destination Name",
     company: "Example Destination Company",
-    street1: unitedstates1.street1,
-    street2: unitedstates1.street2,
-    city: unitedstates1.city,
-    state: unitedstates1.state,
-    zip: unitedstates1.zip,
-    country: unitedstates1.country,
+    street1: canada1.street1,
+    street2: canada1.street2,
+    city: canada1.city,
+    state: canada1.state,
+    zip: canada1.zip,
+    country: canada1.country,
     phone: "415-528-7555",
     email: "example@email.com",
     // federal_tax_id: '12345',
@@ -130,7 +130,7 @@ try {
         from_address: fromAddress,
         // return_address: returnAddress,
         parcel: parcel,
-        // customs_info: customsInfo,
+        customs_info: customsInfo,
         options: {
             print_custom_1: "printCustom1",
             // print_custom_2: "printCustom2",
@@ -141,8 +141,8 @@ try {
             // print_custom_2_barcode: true,
             // label_format: 'PNG',
             // label_size: "4x6",
-            // label_date: "2022-06-25T15:00:00Z"
-            // incoterm: "DAP",
+            // label_date: "2023-06-28T15:00:00Z",
+            // incoterm: "DDP",
             // invoice_number: '123456789'
             // importer_address_id: 'adr_cac53236bc4e49edbc4e07146766998d',
             // payment: {
@@ -166,12 +166,31 @@ try {
             //   pickup_max_datetime: '2022-05-10 10:30:00',
             // customs_broker_address_id: toAddress.id
         },
-        carrier_accounts: [process.env.USPS],
+        carrier_accounts: [process.env.FEDEX],
         // service: 'First',
         reference: crypto.randomUUID(),
     })
 
+    // log entire shipment object
     console.log(JSON.stringify(shipment, null, 2))
+
+    // log any rate errors
+    if (shipment.messages !== []) {
+        console.log("  ")
+        console.log('RATE ERRORS:')
+        for (const message in shipment.messages) {
+            console.log(JSON.stringify(shipment.messages[message], null, 2))
+        }
+    }
+
+    // log any rates
+    if (shipment.rates !== []) {
+        console.log("   ")
+        console.log('RATES:')
+        for (const rate in shipment.rates) {
+            console.log(`${shipment.rates[rate].carrier} - ${shipment.rates[rate].service} - ${shipment.rates[rate].rate}`)
+        }
+    }
 
     //============buy shipment by lowest rate============
     try {
@@ -179,8 +198,11 @@ try {
         console.log("   ")
         console.log(`attempting to purchase ${shipment.id}...`)
         const boughtShipment = await client.Shipment.buy(
-            shipment.id,
-            shipment.lowestRate()
+            shipment.id, // shipment id
+            shipment.lowestRate(), // shipment rate
+            null, // insurance
+            null, // carbon offset
+            // process.env.TEST_ENDSHIPPER_ID_EXAMPLE // end shipper
         )
         console.log(JSON.stringify(boughtShipment, null, 2))
     } catch (error) {

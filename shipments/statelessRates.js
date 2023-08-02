@@ -21,7 +21,7 @@ const client = new EasyPostClient(process.env.TEST_KEY) // testKey
 
 
 try {
-  const rates = await client.Beta.Rate.retrieveStatelessRates({
+  const rates = await client.BetaRate.retrieveStatelessRates({
     to_address: {
       name: 'Dr. Steve Brule',
       street1: '179 N Harbor Dr',
@@ -57,3 +57,4 @@ try {
   console.log("STATELESS RATING ERROR:")
   console.log(error)
 }
+
