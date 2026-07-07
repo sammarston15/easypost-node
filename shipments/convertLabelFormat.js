@@ -5,16 +5,16 @@ dotenv.config()
 import crypto from "crypto"
 import fs from "fs"
 
-const client = new EasyPostClient(process.env.PROD_KEY);  // prodKey
-// const client = new EasyPostClient(process.env.TEST_KEY) // testKey
+// const client = new EasyPostClient(process.env.PROD_KEY);  // prodKey
+const client = new EasyPostClient(process.env.TEST_KEY) // testKey
 
 //============convert shipment label format after purchase============
 try {
-  const shipment = await client.Shipment.retrieve('shp_c506dffd415f4eb59809cef8341c8aaf')
+  const shipment = await client.Shipment.retrieve('shp_968f60d9c6dc49b0a670b3cf887c9b05')
   console.log("   ")
   console.log("   ")
   console.log(`attempting to re-format ${shipment.id}...`)
-  const shipmentWithLabel = await client.Shipment.convertLabelFormat(shipment.id, 'ZPL');
+  const shipmentWithLabel = await client.Shipment.convertLabelFormat(shipment.id, 'PDF');
 
   console.log(shipmentWithLabel);
 

@@ -5,13 +5,13 @@
   "main": "jsonToCSV.js",
   "type": "module",
   "dependencies": {
-    "@easypost/api": "^6.5.0",
-    "dad-tool": "^4.2.0",
-    "dotenv": "^16.1.4",
+    "@easypost/api": "^8.8.0",
+    "dad-tool": "^6.0.0",
+    "dotenv": "^17.4.2",
     "fs": "^0.0.1-security",
-    "inquirer": "^9.2.7",
-    "json-2-csv": "^4.0.0",
-    "puppeteer": "^20.5.0"
+    "inquirer": "^14.0.2",
+    "json-2-csv": "^5.5.11",
+    "puppeteer": "^25.1.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -3,7 +3,7 @@
 import fs from 'fs';
 
 // bring in the data from the misc.json file
-import order from '../misc.json' assert { type: 'json' }
+import order from '../misc.json' with { type: 'json' }
 
 delete order.user
 delete order.user_id

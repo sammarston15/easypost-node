@@ -8,10 +8,10 @@ import fs from "fs"
 // const client = new EasyPostClient(process.env.PROD_KEY);  // prodKey
 const client = new EasyPostClient(process.env.TEST_KEY) // testKey
 // const client = new EasyPostClient(process.env.DISABLED_TEST_KEY);     // DISABLED_TEST_KEY to test the error that comes back
-// const client = new EasyPostClient(process.env.RICK_CARTER_PROD_KEY);     // RICK_CARTER_PROD_KEY
+
 
 // bring in the data from the misc.json file
-import data from "../misc.json" assert { type: "json" }
+import data from "../misc.json" with { type: "json" }
 
 // Delete order address data
 delete data.public_id
@@ -100,38 +100,42 @@ try {
         options: data.options,
         customs_info: data.customs_info,
         // is_return: true,
-        carrier_accounts: [{ id: `${process.env.ASENDIA_USA}` }],
-        // service: "Expedited",
+        carrier_accounts: ['ca_306628706e5844698f724b05125df122'],
+        // service: "UPSStandard",
     })
 
-    console.log(order)
-    console.log('\n\n')
+    for (const i in order.shipments) {
+        console.log(`SHIPMENT ${i} RATES:`)
+        console.log('================\n')
+        for (const ii in order.shipments[i].rates) {
+            console.log(`${order.shipments[i].rates[ii].service} - ${order.shipments[i].rates[ii].carrier}`)
+        }
+    }
 
     if (order.messages.length !== 0) {
       console.log('RATING ERRORS:')
       console.log('==============\n')
       for (const i in order.messages) {
         console.log(order.messages[i])
-        console.log('\n')
       }
     }
 
     //============buy order============
-    // if (order.shipments[0].rates !== []) {
-    //     try {
-    //         const boughtOrder = await client.Order.buy(
-    //             order.id,
-    //             "FedEx", // carrier
-    //             "FEDEX_GROUND" // service
-    //         )
+    if (order.shipments[0].rates !== []) {
+        try {
+            const boughtOrder = await client.Order.buy(
+                order.id,
+                "Purolator", // carrier
+                "PurolatorExpress" // service
+            )
 
-    //         console.log(boughtOrder)
-    //     } catch (error) {
-    //         console.log("   ")
-    //         console.log("ORDER BUY ERROR:")
-    //         console.log(error)
-    //     }
-    // }
+            console.log(boughtOrder)
+        } catch (error) {
+            console.log("   ")
+            console.log("ORDER BUY ERROR:")
+            console.log(error)
+        }
+    }
 
 } catch (error) {
     console.log("   ")

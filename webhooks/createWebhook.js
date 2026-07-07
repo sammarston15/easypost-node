@@ -6,11 +6,12 @@ import crypto from "crypto"
 import fs from "fs"
 
 // const client = new EasyPostClient(process.env.PROD_KEY);  // prodKey
-const client = new EasyPostClient(process.env.TEST_KEY) // testKey
+// const client = new EasyPostClient(process.env.TEST_KEY) // testKey
+const client = new EasyPostClient(process.env.CHILD_TEST_KEY) // child testKey
 
 //============CREATE A WEBHOOK============
 try {
-    const webhook = await client.Webhook.create({ url: 'example.com' });
+    const webhook = await client.Webhook.create({ url: process.env.PIPEDREAM_WEBHOOK_URL });
 
     console.log(webhook);
 } catch (error) {

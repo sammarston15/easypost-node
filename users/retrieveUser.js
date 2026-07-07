@@ -1,11 +1,11 @@
-// THIS IS STILL USING V5
+/* IMPORT EASYPOST AND .ENV INFO */
+import EasyPostClient from "@easypost/api"
+import * as dotenv from "dotenv" // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+dotenv.config()
 
 
-const Easypost = require('@easypost/api');
-require('dotenv').config();
-const api = new Easypost(process.env.PROD_KEY);  // prodKey
-// const api = new Easypost(process.env.TEST_KEY);     // testKey
-// const api = new Easypost(process.env.WEBHOOK_CHILD_PROD_KEY);  // WEBHOOK_CHILD_PROD_KEY    
+const client = new EasyPostClient(process.env.PROD_KEY);  // prodKey
+// const client = new EasyPostClient(process.env.TEST_KEY) // testKey 
 
 
 
@@ -20,4 +20,4 @@ const api = new Easypost(process.env.PROD_KEY);  // prodKey
 
 
 // RETRIEVE ALL API KEYS (YOURS AND YOUR CHILDREN)
-api.ApiKey.all().then(console.log).catch(console.log)
+client.ApiKey.all().then(response => console.log(JSON.stringify(response, null, 2))).catch(console.log)

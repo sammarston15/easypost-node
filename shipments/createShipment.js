@@ -6,36 +6,37 @@ import * as dotenv from "dotenv" // see https://github.com/motdotla/dotenv#how-d
 dotenv.config()
 import crypto from "crypto"
 
-// const client = new EasyPostClient(process.env.PROD_KEY);  // prodKey
+// const client = new EasyPostClient(process.env.PROD_KEY) // prodKey
 const client = new EasyPostClient(process.env.TEST_KEY) // testKey
-// const client = new EasyPostClient(process.env.DISABLED_TEST_KEY);     // DISABLED_TEST_KEY to test the error that comes back
-// const client = new EasyPostClient(process.env.RICK_CARTER_PROD_KEY);     // RICK_CARTER_PROD_KEY
+// const client = new EasyPostClient(process.env.CHILD_TEST_KEY) // child testKey
+// const client = new EasyPostClient(process.env.PERSONAL_TEST_KEY) // personal testKey
 
 /* IMPORT DAD TOOL */
-import dad from "dad-tool"
+import { random } from "dad-tool" // see https://github.com/Justintime50/dad-node
 
 // CREATE DAD ADDRESSES
-const unitedstates1 = dad.random("US_AZ")
-const unitedstates2 = dad.random("US_CA")
-const canada1 = dad.random("CA_BC")
-const canada2 = dad.random("CA_BC")
-const australia1 = dad.random("AU_VT")
-const australia2 = dad.random("AU_VT")
-const unitedkingdom1 = dad.random("EU_UK")
-const unitedkingdom2 = dad.random("EU_UK")
-const spain1 = dad.random("EU_ES")
-const spain2 = dad.random("EU_ES")
+const unitedstates1 = await random("US_UT")
+const unitedstates2 = await random("US_CA")
+const unitedstates3 = await random("US_AZ")
+const canada1 = await random("CA_BC")
+const canada2 = await random("CA_BC")
+const australia1 = await random("AU_VT")
+const australia2 = await random("AU_VT")
+const unitedkingdom1 = await random("EU_UK")
+const unitedkingdom2 = await random("EU_UK")
+const spain1 = await random("EU_ES")
+const spain2 = await random("EU_ES")
 
 // CREATE TO ADDRESS
 const toAddress = await client.Address.create({
     name: "Example Destination Name",
     company: "Example Destination Company",
-    street1: canada1.street1,
-    street2: canada1.street2,
-    city: canada1.city,
-    state: canada1.state,
-    zip: canada1.zip,
-    country: canada1.country,
+    street1: unitedstates2.street1,
+    street2: unitedstates2.street2,
+    city: unitedstates2.city,
+    state: unitedstates2.state,
+    zip: unitedstates2.zip,
+    country: unitedstates2.country,
     phone: "415-528-7555",
     email: "example@email.com",
     // federal_tax_id: '12345',
@@ -46,12 +47,12 @@ const toAddress = await client.Address.create({
 const fromAddress = await client.Address.create({
     name: "Example Origin Name",
     company: "Example Origin Company",
-    street1: unitedstates2.street1,
-    street2: unitedstates2.street2,
-    city: unitedstates2.city,
-    state: unitedstates2.state,
-    zip: unitedstates2.zip,
-    country: unitedstates2.country,
+    street1: unitedkingdom1.street1,
+    street2: unitedkingdom1.street2,
+    city: unitedkingdom1.city,
+    state: unitedkingdom1.state,
+    zip: unitedkingdom1.zip,
+    country: unitedkingdom1.country,
     phone: "415-528-7555",
     email: "example@email.com",
     // federal_tax_id: '12345'
@@ -72,13 +73,28 @@ const returnAddress = await client.Address.create({
     // federal_tax_id: '12345'
 })
 
+// CREATE BUYER ADDRESS
+const buyerAddress = await client.Address.create({
+    name: "Example Buyer Name",
+    company: "Example Buyer Company",
+    street1: unitedstates3.street1,
+    street2: unitedstates3.street2,
+    city: unitedstates3.city,
+    state: unitedstates3.state,
+    zip: unitedstates3.zip,
+    country: unitedstates3.country,
+    phone: "415-528-7555",
+    email: "example@email.com",
+    // federal_tax_id: '12345'
+})
+
 // CREATE PARCEL
 const parcel = await client.Parcel.create({
-    length: 20.2,
-    width: 10.9,
-    height: 5,
-    // predefined_package: 'Parcel',
-    weight: 65,
+    length: 4,
+    width: 8.5,
+    height: 1,
+    // predefined_package: 'Flat',
+    weight: 10,
 })
 
 // CREATE CUSTOMS INFO
@@ -97,7 +113,7 @@ const customsInfo = await client.CustomsInfo.create({
     customs_certify: true,
     customs_signer: "Steve Brule",
     contents_type: "merchandise",
-    contents_explanation: "this is the general notes section",
+    contents_explanation: "#1 dad t-shirts size large", // general notes section for contents
     restriction_type: "none",
     // restriction_comments: '',
     non_delivery_option: "return",
@@ -105,13 +121,13 @@ const customsInfo = await client.CustomsInfo.create({
     /* customs_items can be passed in as instances or ids.
      *  if the item does not have an id, it will be created. */
     customs_items: [
-        customsItem,
+        // customsItem,
         await client.CustomsItem.create({
-            description: "Sweet shirts",
+            description: "#1 dad t-shirts size large",
             quantity: 2,
             weight: 5,
             value: 23,
-            hs_tariff_number: "654321",
+            hs_tariff_number: "6103.22.00",
             origin_country: "US",
             code: "1234",
         }),
@@ -120,19 +136,21 @@ const customsInfo = await client.CustomsInfo.create({
 
 // CREATE SHIPMENT
 try {
-    console.log("attempting to create shipment...")
-    console.log("   ")
-    console.log("   ")
+    console.log("attempting to create shipment...\n")
+
 
     const shipment = await client.Shipment.create({
         // is_return: true,
         to_address: toAddress,
         from_address: fromAddress,
         // return_address: returnAddress,
+        // buyer_address: buyerAddress,
+        // buyer_address: {id: process.env.PROD_IMPORTER_ADDRESS},
         parcel: parcel,
         customs_info: customsInfo,
         options: {
             print_custom_1: "printCustom1",
+            // print_custom_2_code: "PO",
             // print_custom_2: "printCustom2",
             // print_custom_2_code: "PO",
             // print_custom_3: "printCustom3",
@@ -141,10 +159,10 @@ try {
             // print_custom_2_barcode: true,
             // label_format: 'PNG',
             // label_size: "4x6",
-            // label_date: "2023-06-28T15:00:00Z",
+            // label_date: new Date().toISOString(),
             // incoterm: "DDP",
             // invoice_number: '123456789'
-            // importer_address_id: 'adr_cac53236bc4e49edbc4e07146766998d',
+            // importer_address_id: process.env.PROD_IMPORTER_ADDRESS,
             // payment: {
             //   type: "THIRD_PARTY",
             //   account: "510087780",
@@ -158,7 +176,7 @@ try {
             //   postal_code: "12345"
             // }
             // dropoff_max_datetime: '2021-05-20T15:00:00Z',
-            // delivery_confirmation: "NO_SIGNATURE",
+            // delivery_confirmation: "Required",
             // commercial_invoice_format: "PNG",
             //   delivery_min_datetime: '2022-05-10 10:30:00',
             //   delivery_max_datetime: '2022-05-10 10:30:00',
@@ -166,63 +184,104 @@ try {
             //   pickup_max_datetime: '2022-05-10 10:30:00',
             // customs_broker_address_id: toAddress.id
         },
-        carrier_accounts: [process.env.FEDEX],
-        // service: 'First',
+        carrier_accounts: [
+            // process.env.PERSONAL_CANADA_POST_DEFAULT,
+            // process.env.PERSONAL_UPS_DAP,
+            // process.env.PERSONAL_CANADA_POST_DEFAULT,
+            process.env.BYOCA_FEDEX,
+            // process.env.BYOCA_CANADA_POST,
+            // 'ca_b09ac327d3ef49849e1835d6cd94b7f8',
+        ],
+        // service: 'UPSStandard',
         reference: crypto.randomUUID(),
     })
 
     // log entire shipment object
-    console.log(JSON.stringify(shipment, null, 2))
+    // console.log(JSON.stringify(shipment, null, 2))
 
     // log any rate errors
-    if (shipment.messages !== []) {
+    if (shipment.messages.length > 0) {
         console.log("  ")
-        console.log('RATE ERRORS:')
+        console.log(`RATE ERRORS for ${shipment.id}:`)
         for (const message in shipment.messages) {
-            console.log(JSON.stringify(shipment.messages[message], null, 2))
+            console.log({
+                type: shipment.messages[message].type || "N/A",
+                carrier: shipment.messages[message].carrier || "N/A",
+                message: shipment.messages[message].message || "N/A",
+                carrier_account_id:
+                    shipment.messages[message].carrier_account_id || "N/A",
+            })
         }
+    } else {
+        console.log('No rate errors.\n')
     }
 
     // log any rates
-    if (shipment.rates !== []) {
+    if (shipment.rates.length > 0) {
         console.log("   ")
-        console.log('RATES:')
+        console.log(`RATES for ${shipment.id}:`)
         for (const rate in shipment.rates) {
-            console.log(`${shipment.rates[rate].carrier} - ${shipment.rates[rate].service} - ${shipment.rates[rate].rate}`)
+            console.log(
+                `${shipment.rates[rate].carrier} - ${shipment.rates[rate].service} - ${shipment.rates[rate].rate}`,
+            )
         }
+
+        //============buy shipment by lowest rate============
+        try {
+            console.log(`\nattempting to purchase ${shipment.id}...\n`)
+            const boughtShipment = await client.Shipment.buy(
+                shipment.id, // shipment id
+                shipment.lowestRate(), // shipment rate
+                null, // insurance
+                null, // carbon offset
+                // process.env.TEST_ENDSHIPPER_ID_EXAMPLE // end shipper
+            )
+            console.log("Successfully purchased shipment: ", boughtShipment.id || JSON.stringify(boughtShipment, null, 2))
+
+
+            // refund the shipment if it was purchased
+            if (
+                boughtShipment.id &&
+                boughtShipment.selected_rate &&
+                boughtShipment.tracking_code
+            ) {
+                setTimeout(async () => {
+                    console.log(
+                        `\nattempting to refund ${boughtShipment.id}...\n`,
+                    )
+                    const refund = await client.Refund.create({
+                        carrier: boughtShipment.selected_rate.carrier,
+                        tracking_codes: [boughtShipment.tracking_code],
+                    })
+
+                    console.log(refund)
+                }, 5000) // wait 5 seconds before attempting refund
+                
+
+            }
+        } catch (error) {
+            console.log("SHIPMENT BUY ERROR:")
+            console.log(error)
+        }
+
+        //============buy shipment by carrier name/service type============
+        // try {
+        //     const boughtShipment = await client.Shipment.buy(
+        //         shipment.id,
+        //         shipment.lowestRate(["UPS"], ["UPSStandard"])
+        //     )
+        //     console.log('Successfully purchased shipment: ')
+        //     console.log(boughtShipment.id || JSON.stringify(boughtShipment, null, 2))
+        // } catch (error) {
+        //     console.log("   ")
+        //     console.log("SHIPMENT BUY ERROR:")
+        //     console.log(error)
+        // }
+    } else {
+        console.log('No rates available for this shipment.\n')
     }
 
-    //============buy shipment by lowest rate============
-    try {
-        console.log("   ")
-        console.log("   ")
-        console.log(`attempting to purchase ${shipment.id}...`)
-        const boughtShipment = await client.Shipment.buy(
-            shipment.id, // shipment id
-            shipment.lowestRate(), // shipment rate
-            null, // insurance
-            null, // carbon offset
-            // process.env.TEST_ENDSHIPPER_ID_EXAMPLE // end shipper
-        )
-        console.log(JSON.stringify(boughtShipment, null, 2))
-    } catch (error) {
-        console.log("   ")
-        console.log("SHIPMENT BUY ERROR:")
-        console.log(error)
-    }
-
-    //============buy shipment by carrier name/service type============
-    // try {
-    //     const boughtShipment = await client.Shipment.buy(
-    //         shipment.id,
-    //         shipment.lowestRate(["USPS"], ["First"])
-    //     )
-    //     console.log(JSON.stringify(boughtShipment, null, 2))
-    // } catch (error) {
-    //     console.log("   ")
-    //     console.log("SHIPMENT BUY ERROR:")
-    //     console.log(error)
-    // }
+    console.log(`${shipment.id}\n`)
 } catch (error) {
     console.log("   ")
     console.log("SHIPMENT CREATE ERROR:")

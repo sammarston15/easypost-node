@@ -42,12 +42,12 @@ const testCodes = [
 //============create tracker============
 try {
   const tracker = await client.Tracker.create({
-    tracking_code: 'EZ1000000001',
+    tracking_code: '803641616000673326',
     // tracking_code: testCodes[0].trackingCode,
-    carrier: 'USPS',
+    carrier: 'UPS',
   });
 
-  console.log(tracker);
+  console.log(tracker?.id);
 } catch (error) {
   console.log("   ")
   console.log("CREATE TRACKER ERROR:")
