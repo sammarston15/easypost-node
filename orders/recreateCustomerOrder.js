@@ -100,7 +100,14 @@ try {
         options: data.options,
         customs_info: data.customs_info,
         // is_return: true,
-        carrier_accounts: ['ca_306628706e5844698f724b05125df122'],
+        carrier_accounts: [
+            // process.env.PERSONAL_CANADA_POST_DEFAULT,
+            // process.env.PERSONAL_UPS_DAP,
+            // process.env.PERSONAL_CANADA_POST_DEFAULT,
+            // process.env.BYOCA_FEDEX,
+            // process.env.BYOCA_CANADA_POST,
+            "ca_89ad6ff5b1a340a2b26440acf46d1a94",
+        ],
         // service: "UPSStandard",
     })
 
@@ -125,8 +132,8 @@ try {
         try {
             const boughtOrder = await client.Order.buy(
                 order.id,
-                "Purolator", // carrier
-                "PurolatorExpress" // service
+                "DhlEcs", // carrier
+                "DHLParcelGround" // service
             )
 
             console.log(boughtOrder)

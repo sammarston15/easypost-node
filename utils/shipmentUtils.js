@@ -55,3 +55,58 @@ export const getLabelUrl = (shipment) => {
   console.log("=====LABEL URL:=====");
   console.log(JSON.stringify(shipment.postage_label.label_url));
 };
+
+
+// buy shipment
+export const buyShipment = async (client, shipment) => {
+  if (shipment?.rates?.length > 0 && shipment?.selected_rate === null) {
+        try {
+            console.log("   ")
+            console.log("   ")
+            console.log(`attempting to purchase ${shipment.id}...`)
+            const boughtShipment = await client.Shipment.buy(
+                shipment.id, // shipment id
+                shipment.lowestRate(), // use this to buy the lowest rate
+                // shipment.lowestRate( // use this to buy the lowest rate for a specific carrier and service
+                //     ["DHLExpress"], // carrier
+                //     ["EconomySelectNonDoc"] // service
+                // ),
+                null, // insurance
+                null, // carbon offset
+                // process.env.TEST_ENDSHIPPER_ID_EXAMPLE // end shipper
+            )
+            console.log("Shipment purchased: ",
+                boughtShipment?.id
+                    ? boughtShipment.id
+                    : JSON.stringify(boughtShipment, null, 2),
+            )
+            // refund the shipment if it was purchased
+            if (
+                boughtShipment.id &&
+                boughtShipment.selected_rate &&
+                boughtShipment.tracking_code
+            ) {
+                setTimeout(async () => {
+                    console.log("   ")
+                    console.log(
+                        `attempting to refund ${boughtShipment.id}...\n`,
+                    )
+                    const refund = await client.Refund.create({
+                        carrier: boughtShipment.selected_rate.carrier,
+                        tracking_codes: [boughtShipment.tracking_code],
+                    })
+
+                    console.log(refund)
+                }, 10000) // wait 10 seconds before attempting refund
+            }
+        } catch (error) {
+            console.log("   ")
+            console.log("SHIPMENT BUY ERROR:")
+            console.log(error)
+        }
+    } else {
+        console.log(
+            "\nNo purchase attempted because there were no rates available for this shipment or it was a one-call buy.\n",
+        )
+    }
+}

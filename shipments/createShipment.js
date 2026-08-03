@@ -31,12 +31,12 @@ const spain2 = await random("EU_ES")
 const toAddress = await client.Address.create({
     name: "Example Destination Name",
     company: "Example Destination Company",
-    street1: unitedstates2.street1,
-    street2: unitedstates2.street2,
-    city: unitedstates2.city,
-    state: unitedstates2.state,
-    zip: unitedstates2.zip,
-    country: unitedstates2.country,
+    street1: canada1.street1,
+    street2: canada1.street2,
+    city: canada1.city,
+    state: canada1.state,
+    zip: canada1.zip,
+    country: canada1.country,
     phone: "415-528-7555",
     email: "example@email.com",
     // federal_tax_id: '12345',
@@ -47,12 +47,12 @@ const toAddress = await client.Address.create({
 const fromAddress = await client.Address.create({
     name: "Example Origin Name",
     company: "Example Origin Company",
-    street1: unitedkingdom1.street1,
-    street2: unitedkingdom1.street2,
-    city: unitedkingdom1.city,
-    state: unitedkingdom1.state,
-    zip: unitedkingdom1.zip,
-    country: unitedkingdom1.country,
+    street1: australia1.street1,
+    street2: australia1.street2,
+    city: australia1.city,
+    state: australia1.state,
+    zip: australia1.zip,
+    country: australia1.country,
     phone: "415-528-7555",
     email: "example@email.com",
     // federal_tax_id: '12345'
@@ -138,11 +138,37 @@ const customsInfo = await client.CustomsInfo.create({
 try {
     console.log("attempting to create shipment...\n")
 
-
     const shipment = await client.Shipment.create({
         // is_return: true,
         to_address: toAddress,
+        // to_address: {
+        //     name: "Example Destination Name",
+        //     company: "Example Destination Company",
+        //     street1: "Jan Van Zutphenstraat 267, 1069RR, Amsterdam, Noord Holland",
+        //     street2: "",
+        //     city: "Amsterdam",
+        //     state: "Noord Holland",
+        //     zip: "1069RR",
+        //     country: "NL",
+        //     phone: "415-528-7555",
+        //     email: "example@email.com",
+        //     // federal_tax_id: '12345',
+        //     // verify: ['delivery']
+        // },
         from_address: fromAddress,
+        // from_address: {
+        //     name: "Example Origin Name",
+        //     company: "Example Origin Company", 
+        //     street1: "Puchbacherstraße",
+        //     street2: "",
+        //     city: "Maria Lankowitz",
+        //     state: "",
+        //     zip: "8591",
+        //     country: "AT", 
+        //     phone: "415-528-7555",
+        //     email: "example@email.com",
+        //     // federal_tax_id: '12345'
+        // },
         // return_address: returnAddress,
         // buyer_address: buyerAddress,
         // buyer_address: {id: process.env.PROD_IMPORTER_ADDRESS},
@@ -176,7 +202,7 @@ try {
             //   postal_code: "12345"
             // }
             // dropoff_max_datetime: '2021-05-20T15:00:00Z',
-            // delivery_confirmation: "Required",
+            // delivery_confirmation: "adult_signature",
             // commercial_invoice_format: "PNG",
             //   delivery_min_datetime: '2022-05-10 10:30:00',
             //   delivery_max_datetime: '2022-05-10 10:30:00',
@@ -190,10 +216,13 @@ try {
             // process.env.PERSONAL_CANADA_POST_DEFAULT,
             process.env.BYOCA_FEDEX,
             // process.env.BYOCA_CANADA_POST,
-            // 'ca_b09ac327d3ef49849e1835d6cd94b7f8',
+            // process.env.WALLET_USPS,
+            // process.env.TEST_USPS_SHIP,
+            // process.env.FEDEX_CROSS_BORDER,
+            // "ca_b8104905847b4d8b815359d8f5bba143",
         ],
         // service: 'UPSStandard',
-        reference: crypto.randomUUID(),
+        reference: `sam-${crypto.randomUUID().slice(0, 8)}`,
     })
 
     // log entire shipment object
@@ -213,7 +242,7 @@ try {
             })
         }
     } else {
-        console.log('No rate errors.\n')
+        console.log("No rate errors.\n")
     }
 
     // log any rates
@@ -236,8 +265,10 @@ try {
                 null, // carbon offset
                 // process.env.TEST_ENDSHIPPER_ID_EXAMPLE // end shipper
             )
-            console.log("Successfully purchased shipment: ", boughtShipment.id || JSON.stringify(boughtShipment, null, 2))
-
+            console.log(
+                "Successfully purchased shipment: ",
+                boughtShipment.id || JSON.stringify(boughtShipment, null, 2),
+            )
 
             // refund the shipment if it was purchased
             if (
@@ -256,8 +287,6 @@ try {
 
                     console.log(refund)
                 }, 5000) // wait 5 seconds before attempting refund
-                
-
             }
         } catch (error) {
             console.log("SHIPMENT BUY ERROR:")
@@ -278,7 +307,7 @@ try {
         //     console.log(error)
         // }
     } else {
-        console.log('No rates available for this shipment.\n')
+        console.log("No rates available for this shipment.\n")
     }
 
     console.log(`${shipment.id}\n`)

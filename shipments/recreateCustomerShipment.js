@@ -9,6 +9,7 @@ import {
     logShipmentRates,
     getAdminLink,
     getLabelUrl,
+    buyShipment,
 } from "../utils/shipmentUtils.js"
 
 // const client = new EasyPostClient(process.env.PROD_KEY) // prodKey
@@ -47,6 +48,9 @@ if (ship.parcel) {
     delete ship.parcel.created_at
     delete ship.parcel.mode
     delete ship.parcel.updated_at
+    if (ship.parcel?.predefined_package === null) {
+        delete ship.parcel.predefined_package
+    }
 }
 
 if (ship.rates) {
@@ -55,10 +59,6 @@ if (ship.rates) {
 
 if (ship.selected_rate) {
     delete ship.selected_rate
-}
-
-if (ship.parcel?.predefined_package === null) {
-    delete ship.parcel.predefined_package
 }
 
 if (ship.customs_info) {
@@ -90,29 +90,74 @@ if (ship.customs_info) {
     }
 }
 
-// extras (depending on the shipment and the options)
-// if (ship.options.payment) {
-//     delete ship.options.payment
-// }
-// if (ship.options.bill_receiver_account) {
-//     delete ship.options.bill_receiver_account
-// }
-// if (ship.options.bill_receiver_postal_code) {
-//     delete ship.options.bill_receiver_postal_code
-// }
+// OPTIONS
+let options = async () => {
+    // if (ship.options.payment) {
+    //     delete ship.options.payment
+    // }
+    // if (ship.options.bill_receiver_account) {
+    //     delete ship.options.bill_receiver_account
+    // }
+    // if (ship.options.bill_receiver_postal_code) {
+    //     delete ship.options.bill_receiver_postal_code
+    // }
+    // ship.options.label_format = "PDF"
+    // delete ship.options.label_size
+    delete ship.options.label_date
+    delete ship.options.importer_address_id
+    delete ship.options.importer_of_record_address
+    // ship.options.cost_center = "easypost1"
+    // ship.reference = "easypost ref"
+    // ship.customs_info.contents_explanation = "example explanation"
+    // ship.customs_info.customs_items[0].description = "example description"
+    // ship.customs_info.customs_items[1].description = "example description"
+    // ship.customs_info.customs_items[2].description = "example description"
+    // ship.options.importer_address_id = "adr_xxxxx"
 
-// ADDITIONAL OPTIONS
-// ship.options.label_format = "PDF"
-// delete ship.options.label_size
-// ship.options.cost_center = "easypost1"
-// ship.reference = "easypost ref"
-// ship.customs_info.contents_explanation = "example explanation"
-// ship.customs_info.customs_items[0].description = "example description"
-// ship.customs_info.customs_items[1].description = "example description"
-// ship.customs_info.customs_items[2].description = "example description"
-// ship.options.importer_address_id = "adr_xxxxx"
-
-// console.log('ship', JSON.stringify(ship, null, 2))
+    return {
+        ...ship.options, // include all the options from the original shipment, but you can override or add new ones below
+        // address_validation_level: "0",
+        // print_custom_1: "printCustom1",
+        // print_custom_2: "printCustom2",
+        // print_custom_2_code: "PO",
+        // print_custom_3: "printCustom3",
+        // handling_instructions: "handling instructions",
+        // print_custom_3_code: "RMA",
+        // print_custom_1_barcode: true,
+        // print_custom_2_barcode: true,
+        // label_format: 'ZPL',
+        // label_size: "4X6.75_LEADING_DOC_TAB",
+        // label_date: "2022-06-25T15:00:00Z"
+        // incoterm: "DAP",
+        // invoice_number: '123456789'
+        // importer_address_id: 'adr_f82f2dee2b1a11ee98b4ac1f6bc539aa',
+        // importer_address_id: await client.Address.create(ship.from_address).then((address) => address.id),
+        // payment: {
+        //   type: "THIRD_PARTY",
+        //   account: "510087780",
+        //   country: "US",
+        //   postal_code: "12345"
+        // },
+        // duty_payment_account: {
+        //   type: "THIRD_PARTY",
+        //   account: "510087780",
+        //   country: "US",
+        //   postal_code: "12345"
+        // }
+        // dropoff_max_datetime: '2021-05-20T15:00:00Z',
+        // delivery_confirmation: "NO_SIGNATURE",
+        // commercial_invoice_format: "PNG",
+        //   delivery_min_datetime: '2022-05-10 10:30:00',
+        //   delivery_max_datetime: '2022-05-10 10:30:00',
+        //   pickup_min_datetime: '2022-05-10 10:30:00',
+        //   pickup_max_datetime: '2022-05-10 10:30:00',
+        // customs_broker_address_id: toAddress.id
+        // hazmat: "LITHIUM",
+        // hazmat: "PI966-II",
+        // currency: "AUD",
+        // freight_charge: 0,
+    }
+}
 
 // CREATE SHIPMENT
 try {
@@ -138,61 +183,28 @@ try {
         // buyer_address: ship.buyer_address,
         parcel: ship.parcel,
         customs_info: ship.customs_info,
-        options: ship.options,
-        tax_identifiers: ship.tax_identifiers,
-        options: {
-            print_custom_1: "printCustom1",
-            print_custom_2: "printCustom2",
-            // print_custom_2_code: "PO",
-            print_custom_3: "printCustom3",
-            handling_instructions: "handling instructions",
-            // print_custom_3_code: "RMA",
-            // print_custom_1_barcode: true,
-            // print_custom_2_barcode: true,
-            // label_format: 'PNG',
-            // label_size: "4x6",
-            // label_date: "2022-06-25T15:00:00Z"
-            // incoterm: "DAP",
-            // invoice_number: '123456789'
-            // importer_address_id: 'adr_f82f2dee2b1a11ee98b4ac1f6bc539aa',
-            // payment: {
-            //   type: "THIRD_PARTY",
-            //   account: "510087780",
-            //   country: "US",
-            //   postal_code: "12345"
-            // },
-            // duty_payment_account: {
-            //   type: "THIRD_PARTY",
-            //   account: "510087780",
-            //   country: "US",
-            //   postal_code: "12345"
-            // }
-            // dropoff_max_datetime: '2021-05-20T15:00:00Z',
-            // delivery_confirmation: "NO_SIGNATURE",
-            // commercial_invoice_format: "PNG",
-            //   delivery_min_datetime: '2022-05-10 10:30:00',
-            //   delivery_max_datetime: '2022-05-10 10:30:00',
-            //   pickup_min_datetime: '2022-05-10 10:30:00',
-            //   pickup_max_datetime: '2022-05-10 10:30:00',
-            // customs_broker_address_id: toAddress.id
-            // hazmat: "LITHIUM",
-            // hazmat: "PI966-II",
-        },
+        options: await options(),
+        // carrier_accounts: ship.carrier_accounts,
         carrier_accounts: [
-            // process.env.PERSONAL_CANADA_POST_DEFAULT,
-            // process.env.PERSONAL_UPS_DAP,
-            // process.env.PERSONAL_CANADA_POST_DEFAULT,
-            // process.env.BYOCA_FEDEX,
-            // process.env.BYOCA_CANADA_POST,
-            "ca_77b71b3e7e834a94838c2d7c40c5ca03",
+        // process.env.PERSONAL_CANADA_POST_DEFAULT,
+        // process.env.PERSONAL_UPS_DAP,
+        // process.env.PERSONAL_CANADA_POST_DEFAULT,
+        // process.env.BYOCA_FEDEX,
+        // process.env.BYOCA_CANADA_POST,
+        // process.env.WALLET_USPS,
+        // process.env.TEST_USPS_SHIP,
+        // process.env.FEDEX_CROSS_BORDER,
+        "ca_c91561f17cf448e78e4f5be337b11244",
         ],
-        // service: 'First',
-        reference: crypto.randomUUID(),
+        // service: ship.service,
+        // service: 'CBEC',
+        reference: `sam-${crypto.randomUUID().slice(0, 8)}`,
         // invoice_number: "invoice number",
+        tax_identifiers: ship.tax_identifiers || null,
     })
 
     // log entire shipment object
-    console.log(JSON.stringify(shipment, null, 2))
+    // console.log(JSON.stringify(shipment, null, 2))
 
     // log any rate errors
     logRateErrors(shipment)
@@ -203,73 +215,9 @@ try {
     // log shipment ID & admin link
     getAdminLink(shipment)
 
-    //============buy shipment by lowest rate============
-    if (shipment?.rates?.length > 0) {
-        try {
-            console.log("   ")
-            console.log("   ")
-            console.log(`attempting to purchase ${shipment.id}...`)
-            const boughtShipment = await client.Shipment.buy(
-                shipment.id, // shipment id
-                shipment.lowestRate(), // shipment rate
-                null, // insurance
-                null, // carbon offset
-                // process.env.TEST_ENDSHIPPER_ID_EXAMPLE // end shipper
-            )
-            console.log(
-                boughtShipment?.id
-                    ? boughtShipment.id
-                    : JSON.stringify(boughtShipment, null, 2),
-            )
-            // refund the shipment if it was purchased
-            if (
-                boughtShipment.id &&
-                boughtShipment.selected_rate &&
-                boughtShipment.tracking_code
-            ) {
-                setTimeout(async () => {
-                    console.log("   ")
-                    console.log(
-                        `attempting to refund ${boughtShipment.id}...\n`,
-                    )
-                    const refund = await client.Refund.create({
-                        carrier: boughtShipment.selected_rate.carrier,
-                        tracking_codes: [boughtShipment.tracking_code],
-                    })
+    //============buy shipment============
+    buyShipment(client, shipment)
 
-                    console.log(refund)
-                }, 5000) // wait 5 seconds before attempting refund
-            }
-        } catch (error) {
-            console.log("   ")
-            console.log("SHIPMENT BUY ERROR:")
-            console.log(error)
-
-            // print full json
-            console.log(`\n\nSTRINGIFIED:\n${JSON.stringify(error, null, 2)}`)
-        }
-    } else {
-        console.log(
-            "\nNo purchase attempted because there were no rates available for this shipment.\n",
-        )
-    }
-
-    //============buy shipment by carrier name/service type============
-    // try {
-    //     console.log("   ")
-    //     console.log("   ")
-    //     console.log(`attempting to purchase ${shipment.id}...`)
-    //     const boughtShipment = await client.Shipment.buy(
-    //         shipment.id,
-    //         shipment.lowestRate(["UPS"], ["Ground"])
-    //     )
-    //     console.log(JSON.stringify(boughtShipment, null, 2))
-    //     console.log(`\n\nShipment ID: ${boughtShipment.id}`)
-    // } catch (error) {
-    //     console.log("   ")
-    //     console.log("SHIPMENT BUY ERROR:")
-    //     console.log(error)
-    // }
 } catch (error) {
     console.log("   ")
     console.log("SHIPMENT CREATE ERROR:")

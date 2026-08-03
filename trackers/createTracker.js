@@ -5,8 +5,8 @@ dotenv.config()
 import crypto from "crypto"
 import fs from "fs"
 
-// const client = new EasyPostClient(process.env.PROD_KEY);  // prodKey
-const client = new EasyPostClient(process.env.TEST_KEY) // testKey
+const client = new EasyPostClient(process.env.PROD_KEY);  // prodKey
+// const client = new EasyPostClient(process.env.TEST_KEY) // testKey
 
 const testCodes = [
   {
@@ -42,9 +42,9 @@ const testCodes = [
 //============create tracker============
 try {
   const tracker = await client.Tracker.create({
-    tracking_code: '803641616000673326',
+    tracking_code: '500118148896',
     // tracking_code: testCodes[0].trackingCode,
-    carrier: 'UPS',
+    carrier: 'FedExDefault',
   });
 
   console.log(tracker?.id);
